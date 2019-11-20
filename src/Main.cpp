@@ -42,7 +42,6 @@ int main(int argc, char** argv)
             switch (event.type)
             {
                 case SDL_QUIT:
-                    std::cout << "vlw flw";
                     running = false;
                     break;
             }
