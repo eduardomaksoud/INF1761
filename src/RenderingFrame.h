@@ -15,6 +15,21 @@ public:
 
 	SDL_Renderer* renderer = nullptr;
 
+	inline void clear()
+	{
+		SDL_RenderClear(renderer);
+	}
+
+	inline void renderPresent()
+	{
+		SDL_RenderPresent(renderer);
+	}
+
+	inline void getColor(SDL_Color& outColor) const
+	{
+		SDL_GetRenderDrawColor(renderer, &outColor.r, &outColor.g, &outColor.b, &outColor.a);
+	}
+
 	inline void setColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a = 255)
 	{
 		SDL_SetRenderDrawColor(renderer, r, g, b, a);

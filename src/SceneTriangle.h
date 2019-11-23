@@ -4,12 +4,8 @@
 #include "Material.h"
 #include "Triangle.h"
 
-class SceneTriangle : public Triangle
+struct SceneTriangle : public Triangle
 {
-public:
-	const Material& getMaterial() const { return *material; }
-
-private:
 	Material* material;
 };
 
