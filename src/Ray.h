@@ -11,7 +11,7 @@ struct Ray
 	Vector3 direction;
 
 	bool interceptsWith(const Triangle& t, Vector3* interception);
-	bool interceptsWith(const Sphere& s, Vector3* interception);
+	//bool interceptsWith(const Sphere& s, Vector3* interception);
 };
 
 #endif // RAY_H

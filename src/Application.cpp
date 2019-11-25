@@ -18,7 +18,12 @@ Application::Application(RenderingFrame* rf)
 
 void Application::OnStart()
 {
+	SceneTriangle t1;
+	SceneTriangle t2;
+	SceneTriangle t3;
+
 	scene = new Scene();
+	scene->getMainCamera().setPosition(Vector3(0, 0, 0));
 
 	// Initialize materials:
 	red.setColor(255, 0, 0);
@@ -26,13 +31,24 @@ void Application::OnStart()
 	blue.setColor(0, 0, 255);
 
 	// Create triangles:
-	SceneTriangle t1; 
 	t1.material = &red;
-	t1.vertexA = Vector3(-2, 2, 4);
-	t1.vertexB = Vector3(2, 2, 4);
-	t1.vertexC = Vector3(0, -0, 4);
+	t1.vertexA = Vector3(-2, 2, 7);
+	t1.vertexB = Vector3(2, 3, 7);
+	t1.vertexC = Vector3(0, 0, 7);
 
-	scene->AddTriangle(t1);
+	t2.material = &green;
+	t2.vertexA = Vector3(-1,2,2);
+	t2.vertexB = Vector3(2,2,10);
+	t2.vertexC = Vector3(0,-1,3);
+
+	t3.material = &blue;
+	t3.vertexA = Vector3(-1, 2, 2);
+	t3.vertexB = Vector3(2, 2, 5);
+	t3.vertexC = Vector3(0, -1, 3);
+
+	scene->addTriangle(t1);
+	scene->addTriangle(t2);
+	scene->addTriangle(t3);
 }
 
 void Application::OnUpdate(float dt)
@@ -48,12 +64,6 @@ void Application::OnUpdate(float dt)
 	{
 		cam.setPosition(pos - cam.getLocalZAxis() * speed * dt);
 	}
-
-	printf("fps: %.2f\n", (1 / dt));
-
-	//cam.RotateY(2.5 * dt);
-
-	//printf("Camera pos: (%f, %f, %f)\n", pos.x, pos.y, pos.z);
 }
 
 void Application::OnKeyPressed(SDL_Keycode kc)

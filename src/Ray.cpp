@@ -17,37 +17,6 @@ static bool BiasedEquals(float a, float b)
 		return a == b;
 	}
 }
-/*
-bool Ray::interceptsWith(const Triangle& t, Vector3* interception)
-{
-	Vector3 ab = t.vertexB - t.vertexA;
-	Vector3 bc = t.vertexC - t.vertexB;
-
-	Vector3 normal = ab.cross(bc);
-
-	float d = normal.x * t.vertexA.x + normal.y * t.vertexA.y + normal.z * t.vertexA.z;
-
-	interception->x = (d - normal.y * (origin.y - direction.y * origin.x / direction.x) - normal.z * (origin.z - direction.z * origin.x / direction.x))
-		/ (normal.x + normal.y * (direction.y / direction.x) + normal.z * (direction.z / direction.x));
-
-	float k = (interception->x - origin.x);
-
-	// If k is less than zero, it means that the plane we are evaluating is standing behind the origin of our ray.
-	if (k < 0)
-	{
-		return false;
-	}
-
-	interception->y = (direction.y / direction.x) * k + origin.y;
-	interception->z = (direction.z / direction.x) * k + origin.z;
-
-	float triangleAreaDouble = normal.norm();
-	float comparisonAreaDouble = (*interception - t.vertexA).cross(*interception - t.vertexC).norm()
-		+ (*interception - t.vertexA).cross(*interception - t.vertexB).norm()
-		+ (*interception - t.vertexB).cross(*interception - t.vertexC).norm();
-	
-	return BiasedEquals(triangleAreaDouble, comparisonAreaDouble);
-}*/
 
 bool Ray::interceptsWith(const Triangle& t, Vector3* interception)
 {
@@ -61,7 +30,6 @@ bool Ray::interceptsWith(const Triangle& t, Vector3* interception)
 		return false;
 	}
 
-	float triangleAreaDouble = normal.norm();
 	normal.normalize();
 	
 	float k = (normal.dot(t.vertexA) - normal.dot(origin)) / normal.dot(direction);
@@ -76,11 +44,16 @@ bool Ray::interceptsWith(const Triangle& t, Vector3* interception)
 	interception->y = direction.y * k + origin.y;
 	interception->z = direction.z * k + origin.z;
 
-	float comparisonAreaDouble = (*interception - t.vertexA).cross(*interception - t.vertexC).norm()
-		+ (*interception - t.vertexA).cross(*interception - t.vertexB).norm()
-		+ (*interception - t.vertexB).cross(*interception - t.vertexC).norm();
-	
-	//return triangleAreaDouble == comparisonAreaDouble;
-	return BiasedEquals(triangleAreaDouble, comparisonAreaDouble);
+	if (normal.dot(ab.cross(*interception - t.vertexA)) < 0)
+		return false;
+
+	if (normal.dot(bc.cross(*interception - t.vertexB)) < 0)
+		return false;
+
+	if (normal.dot((t.vertexA - t.vertexC).cross(*interception - t.vertexC)) < 0)
+		return false;
+
+	return true; // this ray hits the triangle
 }
+
 

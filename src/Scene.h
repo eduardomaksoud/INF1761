@@ -15,9 +15,20 @@ public:
 	Camera& getMainCamera() { return mainCamera; }
 	const Camera& getMainCamera() const { return mainCamera; }
 
-	void AddTriangle(const SceneTriangle& t)
+	SceneTriangle& getTriangle(int idx)
+	{
+		return triangles[idx];
+	}
+
+	const SceneTriangle& getTriangle(int idx) const
+	{
+		return triangles[idx];
+	}
+
+	int addTriangle(const SceneTriangle& t)
 	{
 		triangles.push_back(t);
+		return triangles.size() - 1;
 	}
 
 private:

@@ -68,10 +68,10 @@ struct Vector3
 		);
 	}
 
-	void rotate(const Vector3& k, double theta)
+	void rotate(const Vector3& k, float theta)
 	{
-		double cosTheta = std::cos(theta);
-		double sinTheta = std::sin(theta);
+		float cosTheta = std::cos(theta);
+		float sinTheta = std::sin(theta);
 
 		*this = (*this * cosTheta) + (k.cross(*this) * sinTheta) + (k * k.dot(*this)) * (1 - cosTheta);
 	}

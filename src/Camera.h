@@ -19,8 +19,8 @@ public:
 
 	void RotateX(float theta)
 	{
-		localYAxis.rotate(localXAxis, theta);
 		localZAxis.rotate(localXAxis, theta);
+		localYAxis.rotate(localXAxis, theta);
 	}
 
 	void RotateY(float theta)
@@ -53,7 +53,7 @@ private:
 	float horizontalFov = PI * 0.5;
 	float verticalFov = PI * 0.5;
 
-	float viewDistance = 20;
+	float viewDistance = 5;
 };
 
 #endif // CAMERA_H
