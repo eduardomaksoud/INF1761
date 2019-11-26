@@ -31,6 +31,8 @@ void Scene::internalRender(RenderingFrame& renderingFrame, int lastX, int lastY,
 	Ray r;
 
 	Vector3 interception;
+	float sphereFirstInterception;
+	float sphereSecondInterception;
 
 	float distance;
 	float horizontalRatio;
@@ -39,10 +41,10 @@ void Scene::internalRender(RenderingFrame& renderingFrame, int lastX, int lastY,
 	float verticalRotation;
 
 	bool intercepted;
-	float nearestTDistance;
-	const SceneTriangle* nearestT;
+	float nearestDistance;
 
-
+	const Material* nearestMaterial;
+	
 	r.origin = mainCamera.getPosition();
 
 	for (int i = firstX; i < lastX; ++i)
@@ -51,8 +53,9 @@ void Scene::internalRender(RenderingFrame& renderingFrame, int lastX, int lastY,
 		
 		for (int j = firstY; j < lastY; ++j)
 		{
-			nearestT = nullptr;
-			nearestTDistance = INFINITY;
+			nearestMaterial = nullptr;
+			nearestDistance = INFINITY;
+			
 			intercepted = false;
 
 			verticalRatio = (j / (float)(renderingFrame.getHeight() - 1));
@@ -65,18 +68,39 @@ void Scene::internalRender(RenderingFrame& renderingFrame, int lastX, int lastY,
 				intercepted = r.interceptsWith(t, &interception);
 				distance = (interception - r.origin).norm();
 				
-				if (intercepted && distance < nearestTDistance)
+				if (intercepted && distance < nearestDistance)
 				{
-					nearestTDistance = distance;
-					nearestT = &t;
+					nearestDistance = distance;
+					nearestMaterial = t.material;
 				}
 			}
-
-			if (nearestT != nullptr)
+			
+			for (const SceneSphere& s : spheres)
 			{
-				auto color = nearestT->material->getColor();
+				sphereFirstInterception = INFINITY;
+				sphereSecondInterception = INFINITY;
+				
+				intercepted = r.interceptsWith(s, &sphereFirstInterception, &sphereSecondInterception);
 
-				float mult = std::max(0.0F, (1 - nearestTDistance / mainCamera.getViewDistance()));
+				if (intercepted)
+				{
+					if (sphereFirstInterception < 0)
+					{
+						sphereFirstInterception = sphereSecondInterception;
+					}
+					if (sphereFirstInterception < nearestDistance)
+					{
+						nearestDistance = sphereFirstInterception;
+						nearestMaterial = s.material;
+					}
+				}
+			}
+			
+			if (nearestMaterial != nullptr)
+			{
+				auto color = nearestMaterial->getColor();
+
+				float mult = std::max(0.0F, (1 - nearestDistance / mainCamera.getViewDistance()));
 				
 				color.r = mult * color.r;
 				color.g = mult * color.g;

@@ -1,5 +1,5 @@
 #ifndef SPHERE_H
-#define TRIANGLE_H
+#define SPHERE_H
 
 #include "Vector3.h"
 

@@ -16,6 +16,10 @@ static void HandleEvents(const SDL_Event& e)
 {
 	switch (e.type)
 	{
+	case SDL_MOUSEMOTION:
+		application->OnMouseMove(e.motion.xrel, e.motion.yrel);
+		break;
+
 	case SDL_KEYDOWN:
 		application->OnKeyPressed(e.key.keysym.sym);
 		break;
@@ -76,6 +80,7 @@ int main(int argc, char** argv)
 
     while (running)
     {
+		SDL_SetRelativeMouseMode(SDL_TRUE);
         while (SDL_PollEvent(&event) != 0)
         {
 			HandleEvents(event);

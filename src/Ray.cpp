@@ -56,4 +56,24 @@ bool Ray::interceptsWith(const Triangle& t, Vector3* interception)
 	return true; // this ray hits the triangle
 }
 
+bool Ray::interceptsWith(const Sphere& s, float *firstInterception,float *secondInterception)
+{
+	Vector3 originToCenter = s.center - origin;
+	float t = originToCenter.dot(direction);
+	 
+	if (t < 0)
+	{ 
+		return false;
+	}
+
+	float y = originToCenter.dot(originToCenter) - t * t;
+	if (y > s.radius) return false;
+
+	float x = sqrt(s.radius - y);
+	*firstInterception = t - x;
+	*secondInterception =  t + x;
+
+	return true; // this ray hits the sphere
+}
+
 
