@@ -10,8 +10,11 @@ struct Ray
 	Vector3 origin;
 	Vector3 direction;
 
-	bool interceptsWith(const Triangle& t, Vector3* interception);
-	bool interceptsWith(const Sphere& s, float* firstInterception, float* secondInterception);
+	bool interceptsWith(const Triangle& t, Vector3* interception) const;
+	bool interceptsWith(const Triangle& t, Vector3* interception, Vector3* normal) const;
+	bool interceptsWith(const Sphere& s, double* firstInterception, double* secondInterception) const;
+	float getReflectionAngle(const Sphere& s, const Vector3& p);
+
 };
 
 #endif // RAY_H

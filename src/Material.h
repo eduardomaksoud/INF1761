@@ -6,17 +6,20 @@
 class Material
 {
 public:
-	const SDL_Color& getColor() const { return color; }
-	void setColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a = 255)
+	const SDL_Color& getDiffuseColor() const { return diffuseColor; }
+	const SDL_Color& getSpecularColor() const { return specularColor; }
+
+	void setDiffuseColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a = 255)
 	{
-		color.r = r;
-		color.g = g;
-		color.b = b;
-		color.a = a;
+		diffuseColor.r = r;
+		diffuseColor.g = g;
+		diffuseColor.b = b;
+		diffuseColor.a = a;
 	}
 
 private:
-	SDL_Color color;
+	SDL_Color diffuseColor;
+	SDL_Color specularColor;
 };
 
 #endif // MATERIAL_H

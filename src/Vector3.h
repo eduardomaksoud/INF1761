@@ -57,7 +57,7 @@ struct Vector3
 	Vector3 getNormalized() const
 	{
 		return (*this) / norm();
-	}
+	} 
 
 	Vector3 cross(const Vector3& v) const
 	{
