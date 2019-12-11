@@ -84,14 +84,14 @@ private:
 
 	struct RayInterceptionData
 	{
-		Vector3 interception;		// the interception found
-		Vector3 normal;				// the ray's normal with the surface intercepted
-		Material* material;	// the intercepted surface's material
-		GeometryType geometryType;	// the intercepted surface's geometry type
-		float distance;				// the distance from the ray's origin to the intercepted surface
+		Vector3 interception;			// the interception found
+		Vector3 normal;					// the ray's normal with the surface intercepted
+		Material* material;				// the intercepted surface's material
+		GeometryType geometryType;		// the intercepted surface's geometry type
+		float distance;					// the distance from the ray's origin to the intercepted surface
 		SphereSide sphereSide;
 	};
-	void findInterceptionWithSceneObjects(const Ray& ray, RayInterceptionData& ret) const;
+	void findInterceptionWithSceneObjects(const Ray& ray, RayInterceptionData& ret, float maxDistance = INFINITY) const;
 };
 
 #endif // SCENE_H

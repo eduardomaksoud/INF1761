@@ -1,15 +1,15 @@
 #include "Application.h"
 
-static Material red;
-static Material green;
-static Material blue;
-static Material white;
-static Material yellow;
-static Material orange;
+static Material redMaterial;
+static Material greenMaterial;
+static Material blueMaterial;
+static Material whiteMaterial;
+static Material yellowMaterial;
+static Material orangeMaterial;
 
-static SDL_Color whiteColor;
-static SDL_Color redColor;
-static SDL_Color blueColor;
+static SDL_Color white;
+static SDL_Color red;
+static SDL_Color blue;
 
 static float speed = 1.2f;
 
@@ -29,45 +29,62 @@ void Application::OnStart()
 {
 	SceneTriangle t1;
 	SceneTriangle t2;
-	SceneTriangle t3;
+
+	SceneTriangle floorT2;
 
 	SceneSphere s1;
 	SceneSphere s2;
+	SceneSphere s3;
 
 	PointLight l;
 
 	scene = new Scene();
-	scene->getMainCamera().setPosition(Vector3(0, 0, 0));
+	scene->getMainCamera().setPosition(Vector3(0, -2, -5));
 
 	// Initialize materials:
-	red.setDiffuseColor(255, 0, 0);
-	white.setDiffuseColor(255, 255, 255);
-	green.setDiffuseColor(0, 255, 0);
-	blue.setDiffuseColor(0, 0, 255);
-	yellow.setDiffuseColor(255, 255, 0);
-	orange.setDiffuseColor(255, 128, 0);
+	redMaterial.setDiffuseColor(255, 0, 0);
+	whiteMaterial.setDiffuseColor(255, 255, 255);
+	greenMaterial.setDiffuseColor(0, 255, 0);
+	blueMaterial.setDiffuseColor(0, 0, 255);
+	yellowMaterial.setDiffuseColor(255, 255, 0);
+	orangeMaterial.setDiffuseColor(255, 128, 0);
 
 	//Initialize colors:
-	whiteColor.r = 255;
-	whiteColor.g = 255;
-	whiteColor.b = 255;
-	whiteColor.a = 1;
+	white.r = 255;
+	white.g = 255;
+	white.b = 255;
+	white.a = 1;
 
-	blueColor.r = 0;
-	blueColor.g = 0;
-	blueColor.b = 255;
-	blueColor.a = 1;
+	blue.r = 0;
+	blue.g = 0;
+	blue.b = 255;
+	blue.a = 1;
 
-	redColor.r = 255;
-	redColor.g = 0;
-	redColor.b = 0;
-	redColor.a = 1;
-	/*
-	t1.material = &green;
-	t1.vertexA = Vector3(-1, 2, 5);
-	t1.vertexB = Vector3(2, 2, 5);
-	t1.vertexC = Vector3(0, -1, 5);
+	red.r = 255;
+	red.g = 0;
+	red.b = 0;
+	red.a = 1;
 	
+	/*t1.material = &greenMaterial;
+	t1.vertexA = Vector3(-5, -1, 5);
+	t1.vertexB = Vector3(15, -1, 5);
+	t1.vertexC = Vector3(15, -1, -15);
+	scene->addTriangle(t1);*/
+
+	t1.material = &greenMaterial;
+	t1.vertexA = Vector3(-7, -1, -7);
+	t1.vertexB = Vector3(1, -1, -15);
+	t1.vertexC = Vector3(-1, -1, -5);
+	scene->addTriangle(t1);
+
+	/*t2.material = &greenMaterial;
+	t2.vertexA = Vector3(15, -1, -15);
+	t2.vertexB = Vector3(-5, -1, 5);
+	t2.vertexB = Vector3(-15, -1, -15);
+
+	scene->addTriangle(t2);*/
+	
+	/*
 	t2.material = &green;
 	t2.vertexA = Vector3(-1,2,2);
 	t2.vertexB = Vector3(2,2,10);
@@ -77,34 +94,72 @@ void Application::OnStart()
 	t3.vertexA = Vector3(-1, 2, 2);
 	t3.vertexB = Vector3(2, 2, 5);
 	t3.vertexC = Vector3(0, -1, 3);
-
-	scene->addTriangle(t1);
-	scene->addTriangle(t2);
-	scene->addTriangle(t3);*/
+	*/
+	
+	//scene->addTriangle(t2);
+	//scene->addTriangle(t3);
 
 	// Create Spheres:
-	
-	s1.material = &green;
-	s1.center = Vector3(0,2,4);
-	s1.radius = 1;
+
+	s1.material = &greenMaterial;
+	s1.center = Vector3(-7,0.5,-8);
+	s1.radius = 0.5;
 	scene->addSphere(s1);
 
+	s2.material = &blueMaterial;
+	s2.center = Vector3(-2, 0, -9);
+	s2.radius = 1;
+	scene->addSphere(s2);
+
+	s3.material = &redMaterial;
+	s3.center = Vector3(-1, 0, -5);
+	s3.radius = 0.4;
+	scene->addSphere(s3);
+
+	/*
 	s2.material = &red;
 	s2.center = Vector3(0,2,7);
 	s2.radius = 2;
 	scene->addSphere(s2);
-	
+	*/
 	// Create Point Light
-	l.color = whiteColor;
+	//l.color = white;
+	//l.intensity = 1;
+	//l.position = Vector3(-3, 0, -10);
+	//scene->addLight(l);
+
+	/*l.color = white;
 	l.intensity = 1;
-	l.position = Vector3(0, 2, -5);
+	l.position = Vector3(1, 0, -8);
+	scene->addLight(l);*/
+
+	l.color = white;
+	l.intensity = 1;
+	l.position = Vector3(2.41, 0.12, -9.15);
 	scene->addLight(l);
 
-	// Create Point Light
-	l.color = blueColor;
+	l.color = blue;
 	l.intensity = 1;
-	l.position = Vector3(0, 2, 20);
+	l.position = Vector3(0, 0, 0);
 	scene->addLight(l);
+
+	/*l.color = white;
+	l.intensity = 1;
+	l.position = Vector3(-6.87, 0.40, -13.85);
+	scene->addLight(l);*
+
+	/*
+	l.color = white;
+	l.intensity = 1;
+	l.position = Vector3(-0.77, 0.08, -0.26);
+	scene->addLight(l);*/
+
+
+	//Create Point Light
+	//l.color = white;
+	//l.intensity = 1;
+	//l.position = Vector3(0, 1, 0);
+	//scene->addLight(l);
 	
 	/*Create Point Light
 	l.color = whiteColor;
@@ -112,7 +167,7 @@ void Application::OnStart()
 	l.position = Vector3(5, 0, 6);
 	scene->addLight(l);
 
-	// Create Point Light
+	//Create Point Light
 	l.color = whiteColor;
 	l.intensity = 1;
 	l.position = Vector3(-5, 0, 6);
@@ -148,7 +203,8 @@ void Application::OnUpdate(float dt)
 	{
 		cam.setPosition(pos - cam.getLocalYAxis() * speed * dt);
 	}
-	//printf("fps: %f", 1 / dt);
+	auto& camPos = scene->getMainCamera().getPosition();
+	printf("fps: %.0f position: %.2f %.2f %.2f\n", 1 / dt, camPos.x, camPos.y, camPos.z);
 }
 
 void Application::OnKeyPressed(SDL_Keycode kc)

@@ -46,7 +46,7 @@ bool Ray::interceptsWith(const Triangle& t, Vector3* interception) const
 	return interceptsWith(t, interception, &normal);
 }
 
-bool Ray::interceptsWith(const Sphere& s, double *firstInterception,double *secondInterception) const
+bool Ray::interceptsWith(const Sphere& s, float *firstInterception, float* secondInterception) const
 {
 	Vector3 originToCenter = s.center - origin;
 	float t = originToCenter.dot(direction);

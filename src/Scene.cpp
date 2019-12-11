@@ -4,6 +4,9 @@
 #include <algorithm>
 #include <future>
 #include <vector>
+#include <iostream>
+
+const char* sombraOuLuz = "luz";
 
 void Scene::render(RenderingFrame& renderingFrame) const
 {
@@ -54,22 +57,23 @@ void Scene::internalRender(RenderingFrame& renderingFrame, int lastX, int lastY,
 	}
 }
 
-void Scene::findInterceptionWithSceneObjects(const Ray& r, Scene::RayInterceptionData& ret) const
+void Scene::findInterceptionWithSceneObjects(const Ray& r, Scene::RayInterceptionData& ret, float maxDistance) const
 {
 	bool intercepted;
+
 	Vector3 tempInterception;
-	float nearestDistance = INFINITY;
+	ret.distance = INFINITY;
 	float tempDistance = INFINITY;
 	ret.material = nullptr;
 
 	for (const SceneTriangle& t : triangles)
 	{
-		ret.geometryType = GeometryType::Triangle;
 		intercepted = r.interceptsWith(t, &tempInterception, &ret.normal);
 		tempDistance = (tempInterception - r.origin).norm();
 
-		if (intercepted && tempDistance < ret.distance)
+		if (intercepted && (tempDistance < ret.distance) && (tempDistance <= maxDistance))
 		{
+			ret.geometryType = GeometryType::Triangle;
 			ret.interception = tempInterception;
 			ret.distance = tempDistance;
 			ret.material = t.material;
@@ -77,10 +81,8 @@ void Scene::findInterceptionWithSceneObjects(const Ray& r, Scene::RayInterceptio
 	}
 	for (const SceneSphere& s : spheres)
 	{
-		ret.geometryType = GeometryType::Sphere;
-		ret.sphereSide = SphereSide::Positive;
-		double sphereFirstInterception = INFINITY;
-		double sphereSecondInterception = INFINITY;
+		float sphereFirstInterception = INFINITY;
+		float sphereSecondInterception = INFINITY;
 
 		intercepted = r.interceptsWith(s, &sphereFirstInterception, &sphereSecondInterception);
 
@@ -88,16 +90,16 @@ void Scene::findInterceptionWithSceneObjects(const Ray& r, Scene::RayInterceptio
 		{
 			if (sphereFirstInterception < 0)
 			{
-				ret.sphereSide = SphereSide::Negative;
 				sphereFirstInterception = sphereSecondInterception;
 			}
-			if (sphereFirstInterception < nearestDistance)
+			if (sphereFirstInterception < ret.distance && sphereFirstInterception <= maxDistance)
 			{
-				nearestDistance = sphereFirstInterception;
+				ret.geometryType = GeometryType::Sphere;
+				ret.distance = sphereFirstInterception;
 				ret.material = s.material;
 
 				ret.interception = r.origin + r.direction * sphereFirstInterception;
-				ret.normal = (s.center - ret.interception) / s.radius;
+				ret.normal = (s.center - ret.interception);
 				ret.normal.normalize();
 			}	
 		}
@@ -117,9 +119,7 @@ SDL_Color Scene::traceRay(const Ray& r) const
 
 	if (rayData.material != nullptr)
 	{
-		float vis = 1;
 		float cosTheta;
-		float bias = 0.95f;
 
 		SDL_Color finalColor;
 		SDL_Color materialColor;
@@ -127,7 +127,7 @@ SDL_Color Scene::traceRay(const Ray& r) const
 		SDL_Color combinedColor;
 
 		Ray shadowRay;
-		Vector3 shadowDirection;
+		Vector3 lightToInterception;
 
 		Vector3 shadowRayInterception;
 		float shadowRayFirstInterception;
@@ -137,59 +137,28 @@ SDL_Color Scene::traceRay(const Ray& r) const
 		finalColor.g = 0;
 		finalColor.b = 0;
 
+		float bias = 0.9f;
+
 		for (const PointLight& l : lightSources)
 		{
-			if (rayData.geometryType == GeometryType::Sphere)
-			{/*
-				if (rayData.sphereSide == SphereSide::Negative)
-				{
-					shadowDirection = rayData.interception -l.position;
-				}
-				else
-				{
-					shadowDirection = l.position - rayData.interception;
-				}*/
-				shadowDirection = rayData.interception - l.position;
-				shadowDirection.normalize();
-				shadowRay.direction = -1*shadowDirection;
-				shadowRay.origin = (rayData.interception + rayData.normal * bias);
+			lightToInterception = rayData.interception - l.position;
+			shadowRay.direction = lightToInterception;
+			shadowRay.direction.normalize();
+			shadowRay.origin = l.position;
 
-				findInterceptionWithSceneObjects(shadowRay, shadowRayData);
+			findInterceptionWithSceneObjects(shadowRay, shadowRayData, lightToInterception.norm()-bias);
 
-				bool intercepted = shadowRayData.material != nullptr;
+			bool intercepted = shadowRayData.material != nullptr;
 
-				if (!intercepted)
-				{
-					materialColor = rayData.material->getDiffuseColor();
-
-					cosTheta = std::max(0.f, rayData.normal.dot(shadowDirection));
-
-					white[0] = std::min(materialColor.r, std::min(materialColor.g, materialColor.b));
-					white[1] = std::min(l.color.r, std::min(l.color.g, l.color.b));
-
-					combinedColor.r = (materialColor.r + l.color.r - white[0] - white[1]) / 2;
-					combinedColor.g = (materialColor.g + l.color.g - white[0] - white[1]) / 2;
-					combinedColor.b = (materialColor.b + l.color.b - white[0] - white[1]) / 2;
-
-					finalColor.r += vis * combinedColor.r * l.intensity * cosTheta;
-					finalColor.g += vis * combinedColor.g * l.intensity * cosTheta;
-					finalColor.b += vis * combinedColor.b * l.intensity * cosTheta;
-				}
-			}
-			else
+			if (!intercepted)
 			{
-				shadowDirection = rayData.interception - l.position;
-				shadowDirection.normalize();
-				shadowRay.direction = shadowDirection;
-				shadowRay.origin = rayData.interception;
+				materialColor = rayData.material->getDiffuseColor();
 
-				findInterceptionWithSceneObjects(shadowRay, shadowRayData);
-
-				bool intercepted = shadowRayData.material != nullptr;
-				if (!intercepted)
+				float cosTheta = shadowRay.direction.dot(rayData.normal);
+				float cosAlpha = r.direction.dot(rayData.normal);
+				if (std::signbit(cosAlpha) == std::signbit(cosTheta))
 				{
-					materialColor = rayData.material->getDiffuseColor();
-
+					cosTheta = std::abs(cosTheta);
 					white[0] = std::min(materialColor.r, std::min(materialColor.g, materialColor.b));
 					white[1] = std::min(l.color.r, std::min(l.color.g, l.color.b));
 
@@ -197,12 +166,51 @@ SDL_Color Scene::traceRay(const Ray& r) const
 					combinedColor.g = (materialColor.g + l.color.g - white[0] - white[1]) / 2;
 					combinedColor.b = (materialColor.b + l.color.b - white[0] - white[1]) / 2;
 
-					finalColor.r += vis * combinedColor.r * l.intensity;
-					finalColor.g += vis * combinedColor.g * l.intensity;
-					finalColor.b += vis * combinedColor.b * l.intensity;
+					finalColor.r += combinedColor.r * l.intensity * cosTheta;
+					finalColor.g += combinedColor.g * l.intensity * cosTheta;
+					finalColor.b += combinedColor.b * l.intensity * cosTheta;
 				}
 			}
 		}
+		/*
+		if (finalColor.r == 0 && finalColor.g == 0 && finalColor.b == 0)
+		{
+			finalColor.r = 255;
+			finalColor.b = 255;
+		}
+		*/
+		/*
+		for (const PointLight& l : lightSources)
+		{
+			interceptionToLight = l.position - rayData.interception;
+			shadowRay.direction = interceptionToLight;
+			shadowRay.direction.normalize();
+			shadowRay.origin = (rayData.interception + rayData.normal * bias);
+
+			findInterceptionWithSceneObjects(shadowRay, shadowRayData, interceptionToLight.norm());
+
+			bool intercepted = shadowRayData.material != nullptr;
+
+			if (!intercepted)
+			{
+				materialColor = rayData.material->getDiffuseColor();
+
+				cosTheta = std::max(0.f, rayData.normal.dot(shadowRay.direction));
+
+				white[0] = std::min(materialColor.r, std::min(materialColor.g, materialColor.b));
+				white[1] = std::min(l.color.r, std::min(l.color.g, l.color.b));
+
+				combinedColor.r = (materialColor.r + l.color.r - white[0] - white[1]) / 2;
+				combinedColor.g = (materialColor.g + l.color.g - white[0] - white[1]) / 2;
+				combinedColor.b = (materialColor.b + l.color.b - white[0] - white[1]) / 2;
+
+				finalColor.r += vis * combinedColor.r * l.intensity * cosTheta;
+				finalColor.g += vis * combinedColor.g * l.intensity * cosTheta;
+				finalColor.b += vis * combinedColor.b * l.intensity * cosTheta;
+				
+			}
+		}
+			*/
 		return finalColor;
 	}
 	else
