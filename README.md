@@ -1,23 +1,10 @@
-# INF1761
-RayTracing
+# INF1761 - Trabalho para a disciplina de Computação Gráfica
 
-# TO DO
-## STEP 1
-Implementar um algoritmo de RayTracing sem otimizações, que seja capaz de renderizar estaticamente uma cena composta por triângulos.
+Implementação de um algoritmo de RayTracing em C++.
 
-## STEP 2
-Aceitar cenas compostas também por esferas.
+# Não implementado
 
-## STEP 3
-Adicionar movimentação pela cena.
-
-## STEP 4
-Adicionar rotação na cena.
-
-## STEP 5
-Aceitar arquivos .obj como inputs para cena.
-
-## STEP 6
-Otimizar o algoritmo de RayTracing.
+- Aceitar arquivos .obj como inputs para cena.
+- Otimizações para o algoritmo de RayTracing.
 
 
